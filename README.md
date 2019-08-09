@@ -5,8 +5,10 @@ Both detailed output and error output are in the output directory.
 
 ## Developer details
 Repository: https://github.com/williamscollege/emissions-calc
+
 Script location: Run locally 
-Developer: Cheryl Handsaker
+
+Developers: Cheryl Handsaker (2018), Updated by Sam Gilman (2019)
 
 ## Stakeholders
 Zilkha Center
