@@ -3,7 +3,7 @@
  *
  * Created by Cheryl Handsaker
  * For Zilkha Center mileage calculations
- *
+ * Updated by Sam Gilman (2019)
  * ***
  *
  * Distance calculator grabbed from https://stackoverflow.com/questions/29003118/get-driving-distance-between-two-points-using-google-maps-api
@@ -69,7 +69,8 @@ $to = '';
 $from = '';
 $dept = '';
 $id = '';
-$total = 0.0;
+$totalAir = 0.0;
+$totalTrain = 0.0;
 $lineNum = 0;
 $errorLines = 0;
 
@@ -82,13 +83,17 @@ while (($line = fgetcsv($travels)) !== FALSE) {
     if ($lineNum == 0) {
 
         // Get the indexes of the columns based on column name
-        $from = array_search('MC_CITYOFORIGIN', $line);
-        $to = array_search('MC_CITYOFDEST', $line);
+        /*
+        * THESE ITEMS MIGHT CHANGE, YOU SHOULD CHECK TO MAKE SURE THEY MATCH
+        * IF NOT, CHANGE THE TEXT BELOW
+        */
+        $from = array_search('City Of Origin', $line);
+        $to = array_search('City Of Dest', $line);
         $dept = array_search('Dept', $line);
-        $id = array_search('EMPLID', $line);
-        $merchant = array_search('MERCHANT', $line);
-        $org = array_search('ORIGINCITY', $line);
-        $dest = array_search('DESTINATION', $line);
+        $id = array_search('ID', $line);
+        $merchant = array_search('Merchant', $line);
+        //$org = array_search('ORIGINCITY', $line);
+        //$dest = array_search('DESTINATION', $line);
 
         // Count the line numbers to make it easy to check errors
         $lineNum = 1;
@@ -132,13 +137,22 @@ while (($line = fgetcsv($travels)) !== FALSE) {
                 fwrite($mileageOutput, $outputTrip);
 
                 // Update the total mileage
-                $total = $total + $tripMileage;
+                if ($mileageSource == $amtrak){
+                  $totalTrain = $totalTrain + $tripMileage;
+                } else {
+                  $totalAir = $totalAir + $tripMileage;
+                }
             }
         }
 
         else {
-            // We have the same source and destination, is it valid?
-            if (($line[$org] != 'n/a') && ($line[$org] != ' ')) {
+            // Remove fees and other similar things from data
+            /*
+            * THIS MAY NEED TO BE UPDATED
+            * IF A LOT OF UNPROCESSED LINES ARE OCCURING AND THEY SEEM TO BE FEES/SOMETHING SIMILAR THEN:
+            *     ADD SOMETHING TO THE IF STATEMENT IN THE SAME FORMAT AS BELOW
+            */
+            if (($line[$from] != "XAA") && ($line[$to] != "XAO") && ($line[$to] != "FEE") && ($line[$from] != "FEE")) {
 
                 // This is badly formatted or needs a lookup so write it to the file
                 $errorLines = $errorLines + 1;
@@ -150,7 +164,7 @@ while (($line = fgetcsv($travels)) !== FALSE) {
 }
 
 //Write the total mileage to the bottom of the mileage file
-$outputTotal = "\n\n\nTotal Miles: " . $total . "\n";
+$outputTotal = "Results:\nAir Miles: " . $totalAir . "\nTrain Miles: " . $totalTrain . "\n";
 
 // If there are error lines, write the total out to the bottom of the mileage file
 if ($errorLines > 0) {
@@ -164,4 +178,3 @@ fwrite($mileageOutput, $outputTotal);
 fclose($travels);
 fclose($mileageOutput);
 fclose($errorOutput);
-
