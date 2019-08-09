@@ -8,7 +8,7 @@ Repository: https://github.com/williamscollege/emissions-calc
 
 Script location: Run locally 
 
-Developers: Cheryl Handsaker (2018), Updated by Sam Gilman (2019)
+Developer: Cheryl Handsaker (2018), Updated by Sam Gilman (2019)
 
 ## Stakeholders
 Zilkha Center
