@@ -59,7 +59,6 @@ function csv_to_array($filename='', $delimiter=',')
  * Amtrak data converted from geojson found here: https://data.world/albert/amtrak
  *
 **/
-
 $mileageOutput = fopen("output/mileage.csv", "w") or die("Unable to open mileage file!");
 $errorOutput = fopen("output/unprocessed.csv", "w") or die("Unable to open error file!");
 $travels = fopen('input/travel.csv', 'r');
@@ -73,6 +72,8 @@ $totalAir = 0.0;
 $totalTrain = 0.0;
 $lineNum = 0;
 $errorLines = 0;
+$org ='';
+
 
 // Process each line of the provided file
 while (($line = fgetcsv($travels)) !== FALSE) {
@@ -82,16 +83,48 @@ while (($line = fgetcsv($travels)) !== FALSE) {
     //Process the header
     if ($lineNum == 0) {
 
+        /* Check the column names against the CSV */
+        if (array_search('MC_CITYOFORIGIN', $line) === FALSE) {
+            echo ('Please replace the origin city code column name with MC_CITYOFORIGIN
+');
+            exit;
+        }
+
+        if (array_search('MC_CITYOFDEST', $line) === FALSE) {
+            echo ('Please replace the destination city code column name with MC_CITYOFDEST
+');
+            exit;
+        }
+
+        if (array_search('DEPTNAME', $line) === FALSE) {
+            echo ('Please replace the department name column name with DEPTNAME
+');
+            exit;
+        }
+
+        if (array_search('PROJECT_ID', $line) === FALSE) {
+            echo ('Please replace the project_id column name with PROJECT_ID
+');
+            exit;
+        }
+
+        if (array_search('MERCHANT', $line) === FALSE) {
+            echo ('Please replace the merchant id column name with MERCHANT
+');
+            exit;
+        }
+
+
         // Get the indexes of the columns based on column name
         /*
         * THESE ITEMS MIGHT CHANGE, YOU SHOULD CHECK TO MAKE SURE THEY MATCH
         * IF NOT, CHANGE THE TEXT BELOW
         */
-        $from = array_search('City Of Origin', $line);
-        $to = array_search('City Of Dest', $line);
-        $dept = array_search('Dept', $line);
-        $id = array_search('ID', $line);
-        $merchant = array_search('Merchant', $line);
+        $from = array_search('MC_CITYOFORIGIN', $line);
+        $to = array_search('MC_CITYOFDEST', $line);
+        $dept = array_search('DEPTNAME', $line);
+        $id = array_search('PROJECT_ID', $line);
+        $merchant = array_search('MERCHANT', $line);
         //$org = array_search('ORIGINCITY', $line);
         //$dest = array_search('DESTINATION', $line);
 
@@ -99,7 +132,7 @@ while (($line = fgetcsv($travels)) !== FALSE) {
         $lineNum = 1;
 
         // Set up the headers in the output and error files
-        $outputHeader = "Dept,Trip Id,Mileage\n";
+        $outputHeader = "Dept,Project Id,Mileage\n";
         fwrite($mileageOutput, $outputHeader);
         $errorHeader = "line,id,origin,destination\n";
         fwrite($errorOutput, $errorHeader);
@@ -111,7 +144,7 @@ while (($line = fgetcsv($travels)) !== FALSE) {
         //Increment the line number
         $lineNum = $lineNum+1;
 
-        // Assume it is aire travel unless AMTRAK is specified
+        // Assume it is air travel unless AMTRAK is specified
         $mileageSource = $airports;
         if (strpos( $line[$merchant], 'AMTRAK' ) !== false) {
             $mileageSource = $amtrak;
