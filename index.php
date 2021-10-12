@@ -3,7 +3,7 @@
  *
  * Created by Cheryl Handsaker
  * For Zilkha Center mileage calculations
- * Updated by Sam Gilman (2019)
+ * Updated by Sam Gilman (2019), (2020)
  * ***
  *
  * Distance calculator grabbed from https://stackoverflow.com/questions/29003118/get-driving-distance-between-two-points-using-google-maps-api
